@@ -1,0 +1,19 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "b4tchkn claude-code-plugins",
+  "metadata": {
+    "version": "0.1.0",
+    "description": "A collection of Claude code plugins developed by b4tchkn."
+  },
+  "owner": {
+    "name": "Kakeru Nakabachi",
+    "email": "baaaakkrad@gmail.com"
+  },
+  "plugins": [
+    {
+      "name": "git-toolbox",
+      "source": "./plugins/git-toolbox",
+      "description": "A plugin that provides various Git-related functionalities to interact with Git repositories."
+    }
+  ]
+}
