@@ -1,6 +1,6 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
-  "name": "b4tchkn claude-code-plugins",
+  "name": "b4tchkn-claude-code-plugins",
   "metadata": {
     "version": "0.1.0",
     "description": "A collection of Claude code plugins developed by b4tchkn."
