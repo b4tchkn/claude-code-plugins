@@ -14,6 +14,11 @@
       "name": "git-toolbox",
       "source": "./plugins/git-toolbox",
       "description": "A plugin that provides various Git-related functionalities to interact with Git repositories."
+    },
+    {
+      "name": "qa-toolbox",
+      "source": "./plugins/qa-toolbox",
+      "description": "A plugin that provides QA workflow tools for test case generation and quality assurance."
     }
   ]
 }
