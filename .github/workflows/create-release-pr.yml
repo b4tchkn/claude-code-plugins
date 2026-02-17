@@ -1,0 +1,141 @@
+name: Create Release PR
+
+on:
+  workflow_dispatch:
+    inputs:
+      plugin:
+        description: "Plugin to release"
+        required: true
+        type: choice
+        options:
+          - git-toolbox
+          - qa-toolbox
+      bump_type:
+        description: "Version bump type"
+        required: true
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  create-release-pr:
+    runs-on: ubuntu-latest
+    env:
+      PLUGIN: ${{ inputs.plugin }}
+      BUMP_TYPE: ${{ inputs.bump_type }}
+    steps:
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.RELEASE_APP_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ steps.app-token.outputs.token }}
+
+      - name: Get current version
+        id: current
+        run: |
+          PLUGIN_JSON="plugins/${PLUGIN}/.claude-plugin/plugin.json"
+          CURRENT_VERSION=$(jq -r '.version' "$PLUGIN_JSON")
+          echo "version=$CURRENT_VERSION" >> "$GITHUB_OUTPUT"
+          echo "Current version: $CURRENT_VERSION"
+
+      - name: Calculate new version
+        id: new
+        env:
+          CURRENT_VERSION: ${{ steps.current.outputs.version }}
+        run: |
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT_VERSION"
+
+          case "$BUMP_TYPE" in
+            major)
+              MAJOR=$((MAJOR + 1))
+              MINOR=0
+              PATCH=0
+              ;;
+            minor)
+              MINOR=$((MINOR + 1))
+              PATCH=0
+              ;;
+            patch)
+              PATCH=$((PATCH + 1))
+              ;;
+          esac
+
+          NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}"
+          echo "version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
+          echo "New version: $NEW_VERSION"
+
+      - name: Update plugin version
+        env:
+          NEW_VERSION: ${{ steps.new.outputs.version }}
+        run: |
+          PLUGIN_JSON="plugins/${PLUGIN}/.claude-plugin/plugin.json"
+          jq --arg v "$NEW_VERSION" '.version = $v' "$PLUGIN_JSON" > tmp.json
+          mv tmp.json "$PLUGIN_JSON"
+
+      - name: Bump marketplace minor version
+        run: |
+          MARKETPLACE=".claude-plugin/marketplace.json"
+          CURRENT=$(jq -r '.metadata.version' "$MARKETPLACE")
+          IFS='.' read -r M_MAJOR M_MINOR M_PATCH <<< "$CURRENT"
+          M_MINOR=$((M_MINOR + 1))
+          M_PATCH=0
+          NEW_MARKETPLACE="${M_MAJOR}.${M_MINOR}.${M_PATCH}"
+          jq --arg v "$NEW_MARKETPLACE" '.metadata.version = $v' "$MARKETPLACE" > tmp.json
+          mv tmp.json "$MARKETPLACE"
+          echo "Marketplace version: $CURRENT -> $NEW_MARKETPLACE"
+
+      - name: Create branch and commit
+        env:
+          NEW_VERSION: ${{ steps.new.outputs.version }}
+        run: |
+          BRANCH="release/${PLUGIN}/v${NEW_VERSION}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$BRANCH"
+          git add "plugins/${PLUGIN}/.claude-plugin/plugin.json" ".claude-plugin/marketplace.json"
+          git commit -m "release: ${PLUGIN} v${NEW_VERSION}"
+          git push origin "$BRANCH"
+
+      - name: Create Pull Request
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          NEW_VERSION: ${{ steps.new.outputs.version }}
+          CURRENT_VERSION: ${{ steps.current.outputs.version }}
+        run: |
+          BRANCH="release/${PLUGIN}/v${NEW_VERSION}"
+          PREV_TAG="${PLUGIN}/v${CURRENT_VERSION}"
+
+          if git rev-parse "$PREV_TAG" >/dev/null 2>&1; then
+            CHANGES=$(git log --oneline "${PREV_TAG}..HEAD" -- "plugins/${PLUGIN}")
+          else
+            CHANGES=$(git log --oneline HEAD -- "plugins/${PLUGIN}" | head -20)
+          fi
+
+          gh pr create \
+            --base main \
+            --head "$BRANCH" \
+            --title "Release ${PLUGIN} v${NEW_VERSION}" \
+            --body "$(cat <<EOF
+          ## Release ${PLUGIN} v${NEW_VERSION}
+
+          **Version bump:** ${CURRENT_VERSION} → ${NEW_VERSION} (${BUMP_TYPE})
+
+          ### Changes
+          \`\`\`
+          ${CHANGES:-No previous tag found. This is the first release.}
+          \`\`\`
+          EOF
+          )"
