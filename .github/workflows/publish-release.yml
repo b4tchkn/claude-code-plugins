@@ -1,0 +1,48 @@
+name: Publish Release
+
+on:
+  pull_request:
+    types:
+      - closed
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  publish-release:
+    if: github.event.pull_request.merged == true && startsWith(github.event.pull_request.head.ref, 'release/')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Extract plugin and version
+        id: extract
+        env:
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+        run: |
+          # Branch format: release/{plugin}/v{version}
+          PLUGIN=$(echo "$HEAD_REF" | cut -d'/' -f2)
+          VERSION=$(echo "$HEAD_REF" | cut -d'/' -f3)
+          TAG="${PLUGIN}/${VERSION}"
+          echo "plugin=$PLUGIN" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "Plugin: $PLUGIN, Version: $VERSION, Tag: $TAG"
+
+      - name: Create tag and release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.extract.outputs.tag }}
+          PLUGIN: ${{ steps.extract.outputs.plugin }}
+          VERSION: ${{ steps.extract.outputs.version }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "actions[bot]@users.noreply.github.com"
+          git tag "$TAG"
+          git push origin "$TAG"
+          gh release create "$TAG" \
+            --title "${PLUGIN} ${VERSION}" \
+            --generate-notes
