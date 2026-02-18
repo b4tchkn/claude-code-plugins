@@ -14,7 +14,22 @@ Generate concise, well-structured test cases from the current branch's code chan
 
 ### 1. Gather Context
 
-Collect all necessary information:
+Parse `$ARGUMENTS` to extract:
+
+- **PR number**: If a numeric value is found in `$ARGUMENTS`, use it as the target PR number
+- **Language flag**: Check for `--lang ja` or `--lang en`
+
+#### If PR number is specified:
+
+Use `gh pr` commands with the PR number to fetch context from that specific PR:
+
+- **PR body**: !`gh pr view $PR_NUMBER --json body --jq '.body'`
+- **PR diff**: !`gh pr diff $PR_NUMBER`
+- **Commit messages**: !`gh pr view $PR_NUMBER --json commits --jq '.commits[].messageHeadline'`
+
+#### If no PR number is specified:
+
+Use the current branch's context:
 
 - **PR body**: !`gh pr view --json body --jq '.body' 2>/dev/null || echo "No PR found"`
 - **Branch diff summary**: !`git diff develop --stat 2>/dev/null || git diff main --stat 2>/dev/null || echo "No diff found"`
@@ -35,6 +50,7 @@ From the gathered context, identify:
 Write test cases in **Markdown format** with the following rules:
 
 #### Language
+
 - Default: English
 - If `$ARGUMENTS` contains `--lang ja` or Japanese text, write in Japanese
 
@@ -44,16 +60,19 @@ Write test cases in **Markdown format** with the following rules:
 ## Test Cases: {Brief title describing the change}
 
 ### Background
+
 {1-2 sentences: what was changed/fixed and why}
 
 ---
 
 ### TC1: {Test case name}
+
 - **Precondition**: {Required state before testing}
 - **Steps**: {What to do}
 - **Expected**: {What should happen}
 
 ### TC2: {Test case name}
+
 - **Precondition**: {Required state before testing}
 - **Steps**: {What to do}
 - **Expected**: {What should happen}
@@ -62,6 +81,7 @@ Write test cases in **Markdown format** with the following rules:
 ```
 
 #### Guidelines
+
 - Keep each field to **1-2 sentences max** - QA engineers should be able to scan quickly
 - Focus on **user-visible behavior**, not implementation details
 - Include the **most critical/risky scenario** as a separate test case
