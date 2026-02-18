@@ -1,7 +1,7 @@
 {
   "name": "git-toolbox",
   "description": "A plugin that provides various Git-related functionalities to interact with Git repositories.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": {
     "name": "Kakeru Nakabachi",
     "email": "baaaakkrad@gmail.com"
