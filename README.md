@@ -1,4 +1,4 @@
-# claude-code-plugins
+# b4tchkn/claude-code-plugins
 
 A collection of [Claude Code](https://docs.anthropic.com/en/docs/claude-code) plugins that enhance Git workflows, QA processes, and usage analytics.
 
