@@ -87,4 +87,4 @@ Contributions are welcome! To add a new plugin or skill:
 
 ## License
 
-TBD
+This project is licensed under the [MIT License](LICENSE).
