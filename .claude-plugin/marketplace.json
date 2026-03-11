@@ -19,6 +19,11 @@
       "name": "qa-toolbox",
       "source": "./plugins/qa-toolbox",
       "description": "A plugin that provides QA workflow tools for test case generation and quality assurance."
+    },
+    {
+      "name": "ccusage-analyzer",
+      "source": "./plugins/ccusage-analyzer",
+      "description": "Analyze Claude Code usage and costs using ccusage CLI to provide insights on token consumption and spending patterns."
     }
   ]
 }
