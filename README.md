@@ -8,7 +8,7 @@ A collection of [Claude Code](https://docs.anthropic.com/en/docs/claude-code) pl
 |--------|---------|-------------|--------|
 | [git-toolbox](#git-toolbox) | 0.3.0 | Git-related workflow automation | 4 |
 | [qa-toolbox](#qa-toolbox) | 0.1.0 | QA workflow tools for test case generation | 2 |
-| [ccusage-analyzer](#ccusage-analyzer) | 0.0.0 | Claude Code usage and cost analysis | 1 |
+| [ccusage-analyzer](#ccusage-analyzer) | 0.1.0 | Claude Code usage and cost analysis | 1 |
 
 ### git-toolbox
 
