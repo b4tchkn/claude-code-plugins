@@ -1,7 +1,7 @@
 {
   "name": "ccusage-analyzer",
   "description": "Analyze Claude Code usage and costs using ccusage CLI to provide insights on token consumption and spending patterns.",
-  "version": "0.1.0",
+  "version": "0.0.0",
   "author": {
     "name": "Kakeru Nakabachi",
     "email": "baaaakkrad@gmail.com"
