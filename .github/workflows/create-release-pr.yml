@@ -10,6 +10,7 @@ on:
         options:
           - git-toolbox
           - qa-toolbox
+          - ccusage-analyzer
       bump_type:
         description: "Version bump type"
         required: true
