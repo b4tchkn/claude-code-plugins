@@ -65,7 +65,7 @@ Check commit message conventions in this priority order:
 find . -maxdepth 1 -name "commitlint.config.*" -o -name ".commitlintrc.*" | head -1
 
 # Analyze existing commit patterns
-git log --oneline -50 --pretty=format:"%s" | grep -oE '^[a-z]+(\([^)]+\))?' | sort | uniq -c | sort -nr
+git log --oneline -50 --pretty=format:"%s" | grep -oE '^[a-z]+' | sort | uniq -c | sort -nr
 ```
 
 ### 4. Detect Language
@@ -91,19 +91,19 @@ Proposed Commit Splits:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Commit 1/3
-Message: feat(auth): implement user registration and login
+Message: feat: implement user registration and login
 Files:
   • src/auth/login.ts
   • src/auth/register.ts
   • src/auth/types.ts
 
 Commit 2/3
-Message: test(auth): add authentication tests
+Message: test: add authentication tests
 Files:
   • tests/auth.test.ts
 
 Commit 3/3
-Message: docs(auth): add authentication documentation
+Message: docs: add authentication documentation
 Files:
   • docs/authentication.md
 
@@ -125,7 +125,7 @@ git diff --staged --name-only
 
 # 3. Commit with generated message
 git commit -m "$(cat <<'EOF'
-<type>(<scope>): <description>
+<type>: <description>
 EOF
 )"
 ```
@@ -143,7 +143,7 @@ git log --oneline -n 10 --graph
 ## Conventional Commits Format
 
 ```
-<type>[optional scope]: <description>
+<type>: <description>
 
 [optional body]
 
@@ -168,14 +168,6 @@ git log --oneline -n 10 --graph
 - `perf`: Performance improvements
 - `test`: Adding or modifying tests
 
-### Breaking Changes
-
-```
-feat!: change user API response format
-
-BREAKING CHANGE: user response now includes additional metadata
-```
-
 ## User Interaction Options
 
 - `y`: Execute proposed commit splits
@@ -198,3 +190,4 @@ BREAKING CHANGE: user response now includes additional metadata
 - **One logical change per commit**: Each commit should represent a single cohesive change
 - **Separate tests**: Test files should be in separate commits from implementation
 - **Backup recommended**: Suggest `git stash` before processing important changes
+- **No scope, no breaking marker**: Always use `type: description` format. Never include `(scope)` or `!` in commit messages.
