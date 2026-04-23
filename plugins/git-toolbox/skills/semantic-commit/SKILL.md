@@ -82,12 +82,12 @@ Determine commit message language:
 git log --oneline -20 --pretty=format:"%s" | grep -cE '[あ-ん]|[ア-ン]|[一-龯]'
 ```
 
-### 5. Propose Commit Splits
+### 5. Display Commit Splits
 
-Present the proposed split to the user:
+Display the computed split to the user for visibility, then proceed to commit without asking for approval. (In `--dry-run` mode, stop here without committing.)
 
 ```
-Proposed Commit Splits:
+Commit Splits:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Commit 1/3
@@ -106,8 +106,6 @@ Commit 3/3
 Message: docs: add authentication documentation
 Files:
   • docs/authentication.md
-
-Proceed with these commits? (y/n/edit):
 ```
 
 ### 6. Execute Sequential Commits
@@ -150,6 +148,8 @@ git log --oneline -n 10 --graph
 [optional footer(s)]
 ```
 
+**Scope is prohibited.** Do not use `<type>(<scope>):` form (e.g., `feat(auth):`, `fix(api):`). Always use `<type>:` only.
+
 ### Standard Types
 
 **Required:**
@@ -168,13 +168,9 @@ git log --oneline -n 10 --graph
 - `perf`: Performance improvements
 - `test`: Adding or modifying tests
 
-## User Interaction Options
+### Breaking Changes
 
-- `y`: Execute proposed commit splits
-- `n`: Cancel
-- `edit`: Edit individual commit messages
-- `merge <num1> <num2>`: Merge specified commits
-- `split <num>`: Further split a specified commit
+Breaking changes are not supported by this skill. Do not use the `!` marker (e.g., `feat!:`). If a change is breaking, describe it in the commit body instead.
 
 ## Error Handling
 
@@ -186,8 +182,9 @@ git log --oneline -n 10 --graph
 
 - **No auto-push**: Never run `git push` automatically
 - **No branch creation**: Commit on the current branch
-- **Project conventions first**: Always respect existing CommitLint config and commit patterns
+- **No approval prompt**: Do not ask the user to confirm the proposed splits. Display the plan and proceed to commit directly (use `--dry-run` if a preview without committing is desired)
+- **No scope, no breaking marker**: Always use `type: description` format. Never include `(scope)` or `!` in commit messages (e.g., use `feat:` not `feat(docs):` or `feat!:`)
+- **Project conventions first**: Always respect existing CommitLint config and commit patterns (except scope and breaking marker — both are always disallowed by this skill)
 - **One logical change per commit**: Each commit should represent a single cohesive change
 - **Separate tests**: Test files should be in separate commits from implementation
 - **Backup recommended**: Suggest `git stash` before processing important changes
-- **No scope, no breaking marker**: Always use `type: description` format. Never include `(scope)` or `!` in commit messages.
