@@ -9,6 +9,7 @@ A collection of [Claude Code](https://docs.anthropic.com/en/docs/claude-code) pl
 | [git-toolbox](#git-toolbox) | 0.3.0 | Git-related workflow automation | 4 |
 | [qa-toolbox](#qa-toolbox) | 0.1.0 | QA workflow tools for test case generation | 2 |
 | [ccusage-analyzer](#ccusage-analyzer) | 0.1.0 | Claude Code usage and cost analysis | 1 |
+| [claude-code-best-practice](#claude-code-best-practice) | 0.1.0 | Claude Code configuration file auditing and auto-improvement | 1 |
 
 ### git-toolbox
 
@@ -42,6 +43,18 @@ Analyze Claude Code usage and costs using the [ccusage](https://github.com/yutak
 
 **`/analyze-usage`** `[--monthly] [--session] [--since YYYYMMDD] [--until YYYYMMDD] [--breakdown]` — Analyze token usage and costs via ccusage CLI. Provides daily/monthly/session reports with cost summaries, cache hit rates, trend analysis, spike detection, and optimization recommendations.
 
+### claude-code-best-practice
+
+A plugin that audits and automatically improves Claude Code configuration files (CLAUDE.md, etc.) based on established best practices.
+
+#### Skills
+
+**`/claude-md-best-practice`** `[--dry-run] [--path <dir>] [--lang <en|ja>]` — Audit all CLAUDE.md files in the repository and automatically apply fixes. Evaluates line length (200-line guideline), monorepo loading behavior (ancestor/descendant/sibling), duplicate content across files, heading hierarchy, and anti-patterns. Reports violations with severity, then applies edits. Use `--dry-run` to preview without writing.
+
+#### Hooks
+
+**`SessionStart` (source: clear)** — Suggests running `/fewer-permission-prompts` every time the user invokes `/clear`. Promotes periodic allowlist maintenance without requiring scheduling or state tracking.
+
 ## Installation
 
 Install individual plugins using the Claude Code CLI:
@@ -55,6 +68,9 @@ claude plugin add --from https://github.com/b4tchkn/claude-code-plugins/tree/mai
 
 # Install ccusage-analyzer
 claude plugin add --from https://github.com/b4tchkn/claude-code-plugins/tree/main/plugins/ccusage-analyzer
+
+# Install claude-code-best-practice
+claude plugin add --from https://github.com/b4tchkn/claude-code-plugins/tree/main/plugins/claude-code-best-practice
 ```
 
 Or install all plugins via the marketplace:
