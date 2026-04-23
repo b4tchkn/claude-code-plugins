@@ -22,12 +22,12 @@ Each skill is a single `SKILL.md` file with YAML frontmatter defining `name`, `d
 
 ## Plugins
 
-| Plugin | Version | Skills |
-|--------|---------|--------|
-| git-toolbox | 0.3.0 | check-github-ci, create-draft-pr, semantic-commit, pr-auto-update |
-| qa-toolbox | 0.1.0 | create-dev-check-list-android, copy-simple-qa-cases |
-| ccusage-analyzer | 0.0.0 | analyze-usage |
-| claude-code-best-practice | 0.0.0 | claude-md-best-practice |
+| Plugin | Skills |
+|--------|--------|
+| git-toolbox | check-github-ci, create-draft-pr, semantic-commit, pr-auto-update |
+| qa-toolbox | create-dev-check-list-android, copy-simple-qa-cases |
+| ccusage-analyzer | analyze-usage |
+| claude-code-best-practice | claude-md-best-practice |
 
 ## Adding a New Plugin
 
