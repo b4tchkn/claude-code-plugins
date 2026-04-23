@@ -1,19 +1,18 @@
 ---
 name: pr-auto-update
 description: Auto-update PR descriptions based on Git change analysis
-argument-hint: [--pr <num>] [--dry-run] [--refresh] [--lang <en|ja>]
+argument-hint: [--pr <num>] [--dry-run] [--lang <en|ja>]
 allowed-tools: Bash(git *), Bash(gh *), Read, Grep
 ---
 
 # PR Auto Update
 
-Update Pull Request descriptions based on the repository's PR template and the latest commits. By default, fills empty sections only. With `--refresh`, re-evaluates existing content against the latest diff and rewrites outdated parts.
+Update Pull Request descriptions based on the repository's PR template and the latest commits. Re-evaluates existing content against the latest diff: sections that still accurately describe the diff are kept as-is, sections describing removed or changed behavior are rewritten, and empty sections are filled.
 
 ## Arguments
 
 - `--pr <number>`: Target PR number (auto-detected from current branch if omitted)
 - `--dry-run`: Show generated content without updating
-- `--refresh`: Re-evaluate existing sections against the latest commits and rewrite parts that no longer match the current diff (e.g., removed features, changed specs). Shows a diff preview and asks for confirmation before applying.
 - `--lang <en|ja>`: Force output language
 
 ## Steps
@@ -71,10 +70,15 @@ Use this information to populate template sections — not to invent sections th
 
 ### 4. Generate/Update Description
 
-#### Mode behavior
+#### Per-section behavior
 
-- **Default (fill-empty)**: For each template section, keep user-written content as-is. Fill only empty sections or placeholder comments.
-- **Refresh (`--refresh`)**: For each template section, compare existing text against the latest diff. Rewrite sections describing behavior that no longer exists or has changed. Keep sections that still accurately describe the diff. Show a section-by-section diff preview and require user confirmation before applying.
+For each template section:
+
+- If the existing text still accurately describes the latest diff → **keep as-is**
+- If the existing text describes behavior that no longer exists or has changed → **rewrite to match current state**
+- If the section is empty or contains only a placeholder → **fill with generated content**
+
+Before applying, show a section-by-section diff preview and require user confirmation.
 
 #### Always preserved
 
@@ -97,7 +101,7 @@ When regenerating a section, if the new content is semantically equivalent to th
 
 If `--dry-run`, print the generated body and stop.
 
-In refresh mode, show the section-by-section diff and wait for user confirmation before proceeding.
+Otherwise show the section-by-section diff and wait for user confirmation before proceeding.
 
 ```bash
 # Use gh api to preserve HTML comments
@@ -121,6 +125,7 @@ Report the PR URL and a one-line summary of what changed.
 - **Follow the repo's PR template** — do not add or remove sections it doesn't define
 - **Preserve unchanged text byte-for-byte** — if a section's new content is semantically equivalent to the existing text, keep the existing text. Skip the update entirely if the whole body is unchanged.
 - **Preserve HTML comments, checklist states, and separators**
+- **Confirm before applying** — always show a section-by-section diff preview and require user confirmation (unless `--dry-run`)
 - **Use `gh api --field body=`** for the update (`gh pr edit --body` escapes HTML comments)
 - **Warn on sensitive content**: alert if the diff touches secrets, credentials, or `.env` files
 - **No code pushes**: this skill only updates PR metadata
