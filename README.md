@@ -9,7 +9,7 @@ A collection of [Claude Code](https://docs.anthropic.com/en/docs/claude-code) pl
 | [git-toolbox](#git-toolbox) | Git-related workflow automation | 4 |
 | [qa-toolbox](#qa-toolbox) | QA workflow tools for test case generation | 2 |
 | [ccusage-analyzer](#ccusage-analyzer) | Claude Code usage and cost analysis | 1 |
-| [claude-code-best-practice](#claude-code-best-practice) | Claude Code configuration file auditing and auto-improvement | 1 |
+| [claude-code-best-practice](#claude-code-best-practice) | Claude Code configuration file auditing and auto-improvement | 4 |
 
 ### git-toolbox
 
@@ -45,11 +45,17 @@ Analyze Claude Code usage and costs using the [ccusage](https://github.com/yutak
 
 ### claude-code-best-practice
 
-A plugin that audits and automatically improves Claude Code configuration files (CLAUDE.md, etc.) based on established best practices.
+A plugin that audits and automatically improves Claude Code configuration files (CLAUDE.md, settings.json, agents, skills) based on established best practices.
 
 #### Skills
 
 **`/claude-md-best-practice`** `[--dry-run] [--path <dir>] [--lang <en|ja>]` — Audit all CLAUDE.md files in the repository and automatically apply fixes. Evaluates line length (200-line guideline), monorepo loading behavior (ancestor/descendant/sibling), duplicate content across files, heading hierarchy, and anti-patterns. Reports violations with severity, then applies edits. Use `--dry-run` to preview without writing.
+
+**`/settings-audit`** `[--dry-run] [--scope <project|user|local|all>] [--lang <en|ja>]` — Audit `.claude/settings.json`, `settings.local.json`, and `~/.claude/settings.json` against official best practices. Detects missing attribution, bloated/dangerous permission allowlists, deprecated keys (`includeCoAuthoredBy`, `Bash(foo:*)`), insecure deny-rule gaps, and ill-scoped hooks. Proposes narrow-only permission fixes and validates JSON via `jq`.
+
+**`/subagent-audit`** `[--dry-run] [--scope <project|user|all>] [--lang <en|ja>]` — Audit `.claude/agents/*.md` and `~/.claude/agents/*.md` frontmatter against official subagent semantics. Detects role-shaped names (`backend-engineer`, `qa`), over-broad tools, deprecated `Task(agent_type)` aliases, `bypassPermissions` red flags, invalid `model`/`effort` combinations, and names shadowing built-in agents (`general-purpose`, `Explore`).
+
+**`/skill-audit`** `[--dry-run] [--scope <project|user|plugin|all>] [--lang <en|ja>]` — Audit `.claude/skills/*/SKILL.md` (including nested monorepo packages and plugin-local skills) against progressive-disclosure best practices. Detects directory-name/frontmatter-name mismatches, trigger-poor descriptions, oversized bodies, conflicting `user-invocable`/`disable-model-invocation`, names shadowing bundled skills, and monorepo placement mismatches.
 
 #### Hooks
 

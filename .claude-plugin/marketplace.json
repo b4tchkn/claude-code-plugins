@@ -28,7 +28,7 @@
     {
       "name": "claude-code-best-practice",
       "source": "./plugins/claude-code-best-practice",
-      "description": "A plugin that audits and automatically improves Claude Code configuration files (CLAUDE.md, etc.) based on established best practices."
+      "description": "A plugin that audits and automatically improves Claude Code configuration files (CLAUDE.md, settings.json, agents, skills) based on established best practices."
     }
   ]
 }
