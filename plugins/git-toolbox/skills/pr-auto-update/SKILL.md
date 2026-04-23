@@ -1,19 +1,20 @@
 ---
 name: pr-auto-update
 description: Auto-update PR descriptions based on Git change analysis
-argument-hint: [--pr <num>] [--dry-run] [--lang <en|ja>]
+argument-hint: [--pr <num>] [--dry-run] [--refresh] [--lang <en|ja>]
 allowed-tools: Bash(git *), Bash(gh *), Read, Grep
 ---
 
 # PR Auto Update
 
-Automatically update Pull Request descriptions by analyzing Git changes. Preserves existing content and only fills in empty sections.
+Update Pull Request descriptions based on the repository's PR template and the latest commits. By default, fills empty sections only. With `--refresh`, re-evaluates existing content against the latest diff and rewrites outdated parts.
 
 ## Arguments
 
 - `--pr <number>`: Target PR number (auto-detected from current branch if omitted)
-- `--dry-run`: Show generated content without actually updating
-- `--lang <en|ja>`: Force output language (`en` or `ja`)
+- `--dry-run`: Show generated content without updating
+- `--refresh`: Re-evaluate existing sections against the latest commits and rewrite parts that no longer match the current diff (e.g., removed features, changed specs). Shows a diff preview and asks for confirmation before applying.
+- `--lang <en|ja>`: Force output language
 
 ## Steps
 
@@ -27,105 +28,99 @@ gh pr list --head $(git branch --show-current) --json number,title,url --jq '.[0
 gh pr view <number> --json number,title,url,body,labels
 ```
 
-- If `--pr <number>` is specified in `$ARGUMENTS`, use that PR
+- If `--pr <number>` is specified, use that PR
 - Otherwise, find the PR associated with the current branch
 - If no PR is found, inform the user and stop
 
-### 2. Analyze Changes
+### 2. Load PR Template
+
+Look up the repository's PR template in this order and use the first one found:
+
+1. `.github/PULL_REQUEST_TEMPLATE.md`
+2. `.github/pull_request_template.md`
+3. `docs/PULL_REQUEST_TEMPLATE.md`
+4. `PULL_REQUEST_TEMPLATE.md`
 
 ```bash
-# Get changed files
+# Example
+cat .github/PULL_REQUEST_TEMPLATE.md 2>/dev/null
+```
+
+If no template exists, fall back to a minimal structure:
+
+```markdown
+## Summary
+
+## Changes
+```
+
+### 3. Analyze Changes
+
+```bash
+# Changed files
 gh pr diff <number> --name-only
 
-# Get diff content (limit to first 1000 lines for large PRs)
+# Diff content (cap at 1000 lines for large PRs)
 gh pr diff <number> | head -1000
 
-# Get commit history
+# All commits in the PR
 gh pr view <number> --json commits --jq '.commits[].messageHeadline'
 ```
 
-Analyze the following dimensions:
-- **File patterns**: docs, tests, CI/CD, dependencies, source code
-- **Change content**: bug fixes, new features, refactoring, performance, security
-- **Commit messages**: semantic prefixes (feat, fix, docs, etc.)
+Use this information to populate template sections — not to invent sections the template doesn't define.
 
-### 3. Generate/Update Description
+### 4. Generate/Update Description
 
-#### Template priority
+#### Mode behavior
 
-1. **Existing PR body**: Preserve all existing content — never modify written sections
-2. **Project template**: Use `.github/PULL_REQUEST_TEMPLATE.md` structure if available
-3. **Default format**: Simple `## What does this change?` format as fallback
+- **Default (fill-empty)**: For each template section, keep user-written content as-is. Fill only empty sections or placeholder comments.
+- **Refresh (`--refresh`)**: For each template section, compare existing text against the latest diff. Rewrite sections describing behavior that no longer exists or has changed. Keep sections that still accurately describe the diff. Show a section-by-section diff preview and require user confirmation before applying.
 
-#### Content preservation rules
+#### Always preserved
 
-- Sections with user-written content: **keep exactly as-is**
-- Empty sections or placeholder comments: **fill with generated content**
-- HTML comments (`<!-- ... -->`): **always preserve**
-- Functional comments (e.g., Copilot review rules): **always preserve**
-- Separators (`---`): **always preserve**
+- HTML comments (`<!-- ... -->`)
+- Checklist check states (`- [x]` / `- [ ]`)
+- Separators (`---`)
+
+#### Idempotence
+
+When regenerating a section, if the new content is semantically equivalent to the existing text, keep the existing text byte-for-byte. Do not rewrite only to change wording, order, or formatting. This applies to the whole body as well: if nothing meaningful changed, the update is a no-op and the PR body is left untouched.
 
 #### Language detection
 
 1. If `--lang` is specified, use that language
-2. Check existing PR body language
-3. Check recent commit messages (50%+ Japanese → Japanese)
+2. Otherwise match the existing PR body language
+3. Otherwise match the majority language of recent commit messages
 4. Default: English
 
-### 4. Update PR
+### 5. Update PR
 
-#### Dry-run mode
+If `--dry-run`, print the generated body and stop.
 
-If `--dry-run` is specified, display the generated description without updating:
-
-```
-=== DRY RUN ===
-Description:
-<generated description>
-```
-
-#### Actual update
-
-**Description** — Use GitHub API to preserve HTML comments:
+In refresh mode, show the section-by-section diff and wait for user confirmation before proceeding.
 
 ```bash
-# IMPORTANT: Use gh api with --field to avoid HTML comment escaping
-# Do NOT use `gh pr edit --body` as it escapes <!-- --> to &lt;!-- --&gt;
+# Use gh api to preserve HTML comments
+# gh pr edit --body escapes <!-- --> to &lt;!-- --&gt;
 gh api \
   --method PATCH \
   "/repos/{owner}/{repo}/pulls/<number>" \
   --field body="<description>"
 ```
 
-### 5. Verify and Report
+### 6. Verify and Report
 
 ```bash
-# Verify the update
 gh pr view <number> --json body --jq '{body: .body[:100]}'
 ```
 
-- Confirm that the description was updated correctly
-- Report the PR URL and summary to the user
+Report the PR URL and a one-line summary of what changed.
 
 ## Rules
 
-### Content Preservation
-
-- **Never modify existing content**: Do not change a single character of user-written text
-- **Fill empty sections only**: Only populate placeholder/comment sections
-- **Preserve all HTML comments**: `<!-- ... -->` must remain intact
-- **Preserve functional comments**: Copilot review rules, bot directives, etc.
-- **Backup before update**: Store the original body in case of rollback needs
-
-### HTML Comment Handling
-
-- **Use `gh api --field body=`** for description updates (preserves HTML comments)
-- **Do NOT use `gh pr edit --body`** (escapes HTML comments)
-- Avoid complex shell pipe operations that could corrupt content
-
-### Safety
-
-- **Recommend `--dry-run`** for first-time use on a repository
-- **Warn on sensitive content**: Alert if changes include secrets, credentials, or `.env` files
-- **No auto-push**: This skill only updates PR metadata — never pushes code
-- **Match project style**: Follow existing PR description patterns in the repository
+- **Follow the repo's PR template** — do not add or remove sections it doesn't define
+- **Preserve unchanged text byte-for-byte** — if a section's new content is semantically equivalent to the existing text, keep the existing text. Skip the update entirely if the whole body is unchanged.
+- **Preserve HTML comments, checklist states, and separators**
+- **Use `gh api --field body=`** for the update (`gh pr edit --body` escapes HTML comments)
+- **Warn on sensitive content**: alert if the diff touches secrets, credentials, or `.env` files
+- **No code pushes**: this skill only updates PR metadata
