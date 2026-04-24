@@ -24,7 +24,7 @@ Each skill is a single `SKILL.md` file with YAML frontmatter defining `name`, `d
 
 | Plugin | Skills |
 |--------|--------|
-| git-toolbox | check-github-ci, create-draft-pr, semantic-commit, pr-auto-update |
+| git-toolbox | check-github-ci, create-draft-pr, semantic-commit, pr-auto-update, ai-review-triage |
 | qa-toolbox | create-dev-check-list-android, copy-simple-qa-cases |
 | ccusage-analyzer | analyze-usage |
 | claude-code-best-practice | claude-md-best-practice, settings-audit, skill-audit, subagent-audit, subagent-driven-prompt-tuning |
