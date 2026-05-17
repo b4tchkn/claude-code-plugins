@@ -11,6 +11,7 @@ on:
           - git-toolbox
           - qa-toolbox
           - ccusage-analyzer
+          - claude-code-best-practice
       bump_type:
         description: "Version bump type"
         required: true

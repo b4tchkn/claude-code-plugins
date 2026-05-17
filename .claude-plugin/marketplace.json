@@ -2,7 +2,7 @@
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "b4tchkn-claude-code-plugins",
   "metadata": {
-    "version": "0.6.0",
+    "version": "0.10.0",
     "description": "A collection of Claude code plugins developed by b4tchkn."
   },
   "owner": {
@@ -24,6 +24,11 @@
       "name": "ccusage-analyzer",
       "source": "./plugins/ccusage-analyzer",
       "description": "Analyze Claude Code usage and costs using ccusage CLI to provide insights on token consumption and spending patterns."
+    },
+    {
+      "name": "claude-code-best-practice",
+      "source": "./plugins/claude-code-best-practice",
+      "description": "A plugin that audits and automatically improves Claude Code configuration files (CLAUDE.md, settings.json, agents, skills) based on established best practices."
     }
   ]
 }

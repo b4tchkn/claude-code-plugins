@@ -20,6 +20,15 @@ plugins/{name}/
 
 Each skill is a single `SKILL.md` with YAML frontmatter: `name`, `description`, `argument-hint`, `allowed-tools`, and optionally `disable-model-invocation`.
 
+## Plugins
+
+| Plugin | Skills |
+|--------|--------|
+| git-toolbox | check-github-ci, create-draft-pr, semantic-commit, semantic-branch, pr-auto-update, ai-review-triage |
+| qa-toolbox | create-dev-check-list-android, copy-simple-qa-cases |
+| ccusage-analyzer | analyze-usage |
+| claude-code-best-practice | claude-md-best-practice, settings-audit, skill-audit, subagent-audit, subagent-driven-prompt-tuning |
+
 ## Adding a New Plugin
 
 1. Create `plugins/{name}/.claude-plugin/plugin.json`

@@ -1,0 +1,9 @@
+{
+  "name": "claude-code-best-practice",
+  "description": "A plugin that audits and automatically improves Claude Code configuration files (CLAUDE.md, settings.json, agents, skills) based on established best practices.",
+  "version": "0.2.0",
+  "author": {
+    "name": "Kakeru Nakabachi",
+    "email": "baaaakkrad@gmail.com"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "description": "Suggests running /fewer-permission-prompts each time the user invokes /clear.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "clear",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/suggest-permissions-cleanup.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
