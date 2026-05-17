@@ -6,7 +6,7 @@ A collection of [Claude Code](https://docs.anthropic.com/en/docs/claude-code) pl
 
 | Plugin | Description | Skills |
 |--------|-------------|--------|
-| [git-toolbox](#git-toolbox) | Git-related workflow automation | 4 |
+| [git-toolbox](#git-toolbox) | Git-related workflow automation | 6 |
 | [qa-toolbox](#qa-toolbox) | QA workflow tools for test case generation | 2 |
 | [ccusage-analyzer](#ccusage-analyzer) | Claude Code usage and cost analysis | 1 |
 | [claude-code-best-practice](#claude-code-best-practice) | Claude Code configuration file auditing and auto-improvement | 4 |
@@ -22,6 +22,8 @@ A plugin that provides various Git-related functionalities to interact with Git 
 **`/create-draft-pr`** `[--ja]` — Automated draft PR creation based on Git change analysis. Performs pre-flight checks, analyzes branch changes, generates PR descriptions (using templates if available), and creates draft PRs. Supports English (default) and Japanese output.
 
 **`/semantic-commit`** `[--dry-run] [--lang <en|ja>]` — Split large changes into meaningful minimal units and commit them sequentially with semantic commit messages. Detects project conventions (CommitLint config, commit history patterns) and language preferences automatically.
+
+**`/semantic-branch`** `[--dry-run] [--lang <en|ja>] [description]` — Create a semantically named branch from current changes or a given description, following `{type}/{subject}` convention. Copies suggested branch name to clipboard in dry-run mode.
 
 **`/pr-auto-update`** `[--pr <num>] [--dry-run] [--lang <en|ja>]` — Auto-update PR descriptions by analyzing Git changes. Preserves existing content and HTML comments, only fills in empty sections. Uses GitHub API directly to avoid comment escaping issues.
 
