@@ -2,7 +2,7 @@
 name: settings-audit
 description: "Audit and improve Claude Code settings files (.claude/settings.json, .claude/settings.local.json, ~/.claude/settings.json) against official best practices. Detects missing attribution configuration, bloated permission allowlists, insecure deny-rule gaps, deprecated keys, and ill-scoped hooks; then proposes or applies concrete edits."
 argument-hint: "[--dry-run] [--scope <project|user|local|all>] [--lang <en|ja>]"
-allowed-tools: "Read, Edit, Write, Glob, Grep, Bash(git *), Bash(jq *), Bash(cat *), Bash(test *)"
+allowed-tools: "Read, Edit, Write, Glob, Grep, WebFetch, Bash(git *), Bash(jq *), Bash(cat *), Bash(test *)"
 ---
 
 # Claude Code Settings Auditor & Fixer
@@ -21,6 +21,8 @@ Audit Claude Code settings files against official best practices and apply safe 
 ## Best Practice Principles
 
 Derived from the upstream `claude-code-best-practice` reference (`best-practice/claude-settings.md`) and the official Claude Code settings docs.
+
+**Always cross-check against the latest official docs at audit time.** The principles below are a static baseline that can drift as keys are deprecated or added. Before auditing, fetch the current docs (see step 0) and reconcile any conflict in favor of the live documentation. If a fetch fails, do not guess — mark the affected finding as "verification needed (docs unreachable)".
 
 ### 1. Use settings.json, not CLAUDE.md, for harness-enforced behavior
 
@@ -92,6 +94,19 @@ Implications:
 
 ## Steps
 
+### 0. Fetch Latest Official Docs
+
+Before checking anything, WebFetch the current docs and reconcile them against the static principles above. Fetch at least the settings page; the others as needed:
+
+- `https://code.claude.com/docs/en/settings` — all available keys, types, scopes, precedence (required)
+- `https://json.schemastore.org/claude-code-settings.json` — machine-checkable schema for invalid-key / type-violation detection
+- `https://code.claude.com/docs/en/permissions` — permission pattern syntax (required when auditing `allow`/`deny`/`ask`)
+- `https://code.claude.com/docs/en/hooks` — hook event/matcher names (required when `hooks` is present)
+- `https://code.claude.com/docs/en/cli-reference` — current config CLI flags (only if referencing CLI behavior)
+- `https://code.claude.com/docs/en/changelog` — recent deprecations / new keys (only when a key looks ambiguous)
+
+`docs.claude.com` 301-redirects to `code.claude.com`; follow the redirect and refetch the new URL. Record the page name + cited key for each finding so the report can quote its source. If a fetch fails, proceed with the static baseline but flag every doc-dependent finding as "verification needed (docs unreachable)" rather than asserting it.
+
 ### 1. Discover Settings Files
 
 Resolve target paths based on `--scope`:
@@ -121,6 +136,7 @@ Apply the anti-pattern table in order. For each violation, record:
 - current value
 - proposed value (or `null` for removal)
 - explanation (one line)
+- doc source (page name + key) from step 0, or "verification needed" if unconfirmed
 
 Cross-file checks:
 - Diff `allow` arrays between user + project + local; report duplicates.
