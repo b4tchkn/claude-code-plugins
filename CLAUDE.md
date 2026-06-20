@@ -71,3 +71,17 @@ Common `allowed-tools` patterns: `Bash(git *)`, `Bash(gh *)`, `Bash(npx ccusage*
 - Each plugin has independent semver in `plugin.json`
 - Root marketplace version bumps minor on every plugin release
 - Tags: `{plugin}/v{version}`
+
+### GitHub Actions
+
+Pin all `uses:` references to a full commit SHA, not a tag. Add the exact patch version as a comment.
+
+```yaml
+# Good
+- uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+# Bad
+- uses: actions/checkout@v4
+```
+
+To find the SHA for a tag: `gh api repos/{owner}/{repo}/git/ref/tags/{tag} --jq '.object.sha'`
