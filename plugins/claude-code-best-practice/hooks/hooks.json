@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/perm-count-increment.sh",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/fewer-prompts-nudge-increment.sh",
             "async": true
           }
         ]
@@ -17,7 +17,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/perm-count-check.sh",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/fewer-prompts-nudge-check.sh",
             "timeout": 5
           }
         ]
