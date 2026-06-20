@@ -1,8 +1,8 @@
 ---
 name: semantic-branch
 description: Create a semantically named branch from current changes or a given description
-argument-hint: [--dry-run] [--lang <en|ja>] [description]
-allowed-tools: Bash(git *), Bash(echo * | pbcopy)
+argument-hint: "[--dry-run] [--lang <en|ja>] [description]"
+allowed-tools: "Bash(git *), Bash(echo * | pbcopy)"
 ---
 
 # Semantic Branch

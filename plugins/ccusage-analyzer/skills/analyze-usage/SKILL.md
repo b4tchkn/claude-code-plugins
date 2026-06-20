@@ -1,7 +1,7 @@
 ---
 name: analyze-usage
 description: Analyze Claude Code usage and costs using ccusage CLI. Provides daily/monthly reports with cost summaries, trend analysis, and optimization insights.
-argument-hint: [--monthly] [--session] [--since YYYYMMDD] [--until YYYYMMDD] [--breakdown]
+argument-hint: "[--monthly] [--session] [--since YYYYMMDD] [--until YYYYMMDD] [--breakdown]"
 allowed-tools: Bash(npx ccusage*)
 ---
 
