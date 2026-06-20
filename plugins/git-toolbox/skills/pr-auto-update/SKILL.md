@@ -1,7 +1,7 @@
 ---
 name: pr-auto-update
 description: Auto-update PR descriptions based on Git change analysis
-argument-hint: [--pr <num>] [--dry-run] [--lang <en|ja>]
+argument-hint: "[--pr <num>] [--dry-run] [--lang <en|ja>]"
 allowed-tools: Bash(git *), Bash(gh *), Read, Grep
 ---
 

@@ -1,7 +1,7 @@
 ---
 name: copy-simple-qa-cases
 description: Generate QA test cases from branch diff and PR body for manual testing handoff. Use when the user wants to create test cases, QA checklist, or testing instructions for a pull request.
-argument-hint: [--lang en|ja] [PR number]
+argument-hint: "[--lang en|ja] [PR number]"
 disable-model-invocation: true
 allowed-tools: Bash(git:*), Bash(gh:*), Read, Grep, Glob
 ---

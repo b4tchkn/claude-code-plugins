@@ -1,7 +1,7 @@
 ---
 name: semantic-commit
 description: Split large changes into meaningful minimal units and commit with semantic messages
-argument-hint: [--dry-run] [--lang <en|ja>]
+argument-hint: "[--dry-run] [--lang <en|ja>]"
 allowed-tools: Bash(git *)
 ---
 
