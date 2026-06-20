@@ -71,3 +71,13 @@ Common `allowed-tools` patterns: `Bash(git *)`, `Bash(gh *)`, `Bash(npx ccusage*
 - Each plugin has independent semver in `plugin.json`
 - Root marketplace version bumps minor on every plugin release
 - Tags: `{plugin}/v{version}`
+
+### External Dependencies
+
+Always pin external dependencies to an exact, reproducible version — no floating references anywhere in the project.
+
+- **GitHub Actions**: pin `uses:` to a full commit SHA; add the exact patch version as a comment
+  - `actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1`
+  - To find SHA: `gh api repos/{owner}/{repo}/git/ref/tags/{tag} --jq '.object.sha'`
+- **npm**: use exact version (`@2.1.183`), never a range or bare package name
+- **Any other package manager or tool** (pip, cargo, brew, etc.): same rule — exact version only
