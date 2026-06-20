@@ -1,13 +1,24 @@
 {
-  "description": "Suggests running /fewer-permission-prompts each time the user invokes /clear.",
+  "description": "Counts permission requests per session and suggests /fewer-permission-prompts at Stop when the count reaches the threshold.",
   "hooks": {
-    "SessionStart": [
+    "PermissionRequest": [
       {
-        "matcher": "clear",
         "hooks": [
           {
             "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/suggest-permissions-cleanup.sh"
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/perm-count-increment.sh",
+            "async": true
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/perm-count-check.sh",
+            "timeout": 5
           }
         ]
       }
